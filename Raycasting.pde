@@ -1,25 +1,31 @@
-final float LIGHTS = 50;
-final float WALLS = 50;
+final float LIGHTS = 2;
+final float WALLS = 7;
 
 //noiseloop variables
 final float NL_R_MIN = 1;
-final float NL_R_MAX = 1;
+final float NL_R_MAX = 5;
 
-final float NL_FR_MIN = 180;
-final float NL_FR_MAX = 600;
+final float NL_FR_MIN = 1000;
+final float NL_FR_MAX = 5000;
 
 final float NL_POS_MIN = -1000;
 final float NL_POS_MAX = 1000;
 
-final float NL_NOISE_MIN = -360;
-final float NL_NOISE_MAX = 360;
+final float NL_NOISE_MIN_POS = -360;
+final float NL_NOISE_MAX_POS = 360;
+
+final float NL_NOISE_MIN_HD = radians(-180);
+final float NL_NOISE_MAX_HD = radians(180);
 
 //lightsource variables
-final float LS_LUM_MIN = 25;
-final float LS_LUM_MAX = 200;
+final float LS_LUM_MIN = 50;
+final float LS_LUM_MAX = 150;
 
-final float LS_FOV_MIN = radians(360);
-final float LS_FOV_MAX = radians(360);
+final float LS_HD_MIN = radians(-90);
+final float LS_HD_MAX = radians(270);
+
+final float LS_FOV_MIN = radians(30);
+final float LS_FOV_MAX = radians(90);
 
 final float LS_HU_MIN = 0;
 final float LS_HU_MAX = 360;
@@ -30,7 +36,7 @@ final float LS_SA_MAX = 360;
 final float LS_BR_MIN = 360;
 final float LS_BR_MAX = 360;
 
-ArrayList<LightSource> sources;
+ArrayList<DirectionalLightSource> sources;
 ArrayList<PVector> startingPos;
 ArrayList<NoiseLoop> loops;
 ArrayList<Wall> walls;
@@ -43,11 +49,11 @@ void setup() {
 
 void refresh() {
     loops = new ArrayList<NoiseLoop>();
-    sources = new ArrayList<LightSource>();
+    sources = new ArrayList<DirectionalLightSource>();
     startingPos = new ArrayList<PVector>();
     
     for(int i=0; i<LIGHTS; i++) {
-        for(int j=0; j<2; j++) {
+        for(int j=0; j<3; j++) {
             NoiseLoop nl = new NoiseLoop (
                 random(NL_R_MIN,NL_R_MAX)
               , random(NL_FR_MIN,NL_FR_MAX)
@@ -60,9 +66,10 @@ void refresh() {
         
         startingPos.add(start);
         
-        LightSource ls = new LightSource (
+        DirectionalLightSource ls = new DirectionalLightSource (
             random(LS_LUM_MIN,LS_LUM_MAX)
           , start
+          , random(LS_HD_MIN,LS_HD_MAX)
           , random(LS_FOV_MIN,LS_FOV_MAX)
           , random(LS_HU_MIN,LS_HU_MAX)
           , random(LS_SA_MIN,LS_SA_MAX)
@@ -86,19 +93,23 @@ void draw() {
     background(0);
     
     for(int i=0; i<sources.size(); i++) {
-        LightSource ls = sources.get(i);
+        DirectionalLightSource ls = sources.get(i);
         PVector sp = startingPos.get(i);
-        NoiseLoop nlX = loops.get(2*i);
-        NoiseLoop nlY = loops.get(2*i+1);
+        NoiseLoop nlX = loops.get(3*i);
+        NoiseLoop nlY = loops.get(3*i+1);
+        NoiseLoop nlH = loops.get(3*i+2);
         
         PVector newPos = PVector.add(
             sp
           , new PVector (
-              nlX.getNoise(frameCount,NL_NOISE_MIN,NL_NOISE_MAX)
-            , nlY.getNoise(frameCount,NL_NOISE_MIN,NL_NOISE_MAX)
+              nlX.getNoise(frameCount,NL_NOISE_MIN_POS,NL_NOISE_MAX_POS)
+            , nlY.getNoise(frameCount,NL_NOISE_MIN_POS,NL_NOISE_MAX_POS)
           )
         );
         
+        float newHeading = nlH.getNoise(frameCount,NL_NOISE_MIN_HD,NL_NOISE_MAX_HD);
+        
+        ls.updateHeading("REPLACE", newHeading);
         ls.update(newPos);
         ls.cast(walls);
         ls.show();

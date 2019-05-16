@@ -1,5 +1,5 @@
-final float LIGHTS = 6;
-final float WALLS = 12;
+final float LIGHTS = 50;
+final float WALLS = 50;
 
 //noiseloop variables
 final float NL_R_MIN = 1;
@@ -24,10 +24,10 @@ final float LS_FOV_MAX = radians(360);
 final float LS_HU_MIN = 0;
 final float LS_HU_MAX = 360;
 
-final float LS_SA_MIN = 100;
+final float LS_SA_MIN = 360;
 final float LS_SA_MAX = 360;
 
-final float LS_BR_MIN = 250;
+final float LS_BR_MIN = 360;
 final float LS_BR_MAX = 360;
 
 ArrayList<LightSource> sources;

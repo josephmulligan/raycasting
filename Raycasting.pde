@@ -1,5 +1,9 @@
 final float LIGHTS = 2;
-final float WALLS = 7;
+final float WALLS = 8;
+
+//misc constants
+final float WALL_LEN_MIN = 300;
+final float WALL_LEN_MAX = 500;
 
 //noiseloop variables
 final float NL_R_MIN = 1;
@@ -24,8 +28,8 @@ final float LS_LUM_MAX = 150;
 final float LS_HD_MIN = radians(-90);
 final float LS_HD_MAX = radians(270);
 
-final float LS_FOV_MIN = radians(30);
-final float LS_FOV_MAX = radians(90);
+final float LS_FOV_MIN = radians(60);
+final float LS_FOV_MAX = radians(240);
 
 final float LS_HU_MIN = 0;
 final float LS_HU_MAX = 360;
@@ -81,7 +85,14 @@ void refresh() {
     
     walls = new ArrayList<Wall>();
     for(int i=0; i<WALLS; i++) {
-        walls.add(new Wall(new PVector(random(width),random(height)),new PVector(random(width),random(height))));
+        PVector p1 = new PVector(random(width),random(height));
+        PVector p2;
+        float d;
+        do {
+            p2 = new PVector(random(width),random(height));
+            d = dist(p1.x,p1.y,p2.x,p2.y);
+        } while (d<WALL_LEN_MIN || d>WALL_LEN_MAX);
+        walls.add(new Wall(p1,p2));
     }
     walls.add(new Wall(new PVector(0,0),new PVector(width,0)));
     walls.add(new Wall(new PVector(width,0),new PVector(width,height)));
